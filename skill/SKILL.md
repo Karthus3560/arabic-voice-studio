@@ -54,6 +54,8 @@ Name the voices once and switch per segment; each segment may also set `"lang"`:
 ]
 ```
 
+Need an extra voice that isn't a real person? `"voice": "stock"` is Chatterbox's built-in voice, and `nova-ai.wav` in the voices folder is a synthetic reference cloned from Kokoro's `af_nova` (make more with `npx hyperframes tts "<15 s of text>" -v <preset> -o x.wav`, then convert to 24 kHz mono).
+
 Engine per segment: English without tags → classic (uses emotion), English with inline `[tags]` → Turbo (acts the tags, ignores emotion), other languages → multilingual. Force one with `"engine"`. `"caption"` is copied into the timeline for subtitles. See `examples/voice-swap-trailer.json`.
 
 Rules that keep Arabic clean:
@@ -76,6 +78,8 @@ Run it in the background: both models load once (~40 s each) plus ~5 s per segme
 
 ## 3. Review, then fix single lines
 Send the wav with SendUserFile and ask the user to listen for repeated or cut-off words. `forcing EOS token` in Arabic is normal. To redo one line, change its `"seed"` and rerun; everything else stays identical because seeds are fixed.
+
+If two voices sound identical, check the reference files are really different before tuning anything: `md5sum voices/*.wav`. A copied placeholder reference is the usual cause.
 
 ## 4. Use it in a video
 The timeline drives captions and lip-sync: switch an avatar to its laugh frame during `kind: "sfx"` segments, and pick mouth frames from audio loudness during speech. See `demo/` in the repo for a HyperFrames example.

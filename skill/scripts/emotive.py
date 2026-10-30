@@ -62,8 +62,11 @@ SR = 24000
 
 
 def voice_path(s):
+    """Reference wav for a segment, or None for the model's built-in stock voice."""
     v = s.get("voice", spec["voice"])
     v = voices.get(v, v)
+    if v == "stock":
+        return None
     return v if os.path.isabs(v) else os.path.join(base, v)
 
 
@@ -114,6 +117,7 @@ for engine in ("classic", "turbo", "multilingual"):
         continue
     model = load(engine)
     SR = model.sr
+    stock_conds = model.conds  # the built-in voice, before any cloning overwrites it
     for n, i in enumerate(todo):
         s = segments[i]
         text = s.get("prompt", s.get("sfx", s.get("text")))
@@ -122,15 +126,17 @@ for engine in ("classic", "turbo", "multilingual"):
         print(f"[{engine} {n + 1}/{len(todo)}] ({s.get('voice', spec['voice'])}, "
               f"{s.get('emotion', 'normal')}) {text}")
         torch.manual_seed(s.get("seed", seed))
+        ref = voice_path(s)
+        if ref is None:
+            model.conds = stock_conds
         # Passing the reference every time re-primes the voice, since exaggeration is baked into it.
         if engine == "turbo":
-            wav = model.generate(text, audio_prompt_path=voice_path(s))
+            wav = model.generate(text, audio_prompt_path=ref)
         elif engine == "multilingual":
             wav = model.generate(text, language_id=s.get("lang", spec.get("lang")),
-                                 audio_prompt_path=voice_path(s), exaggeration=exa, cfg_weight=cfg)
+                                 audio_prompt_path=ref, exaggeration=exa, cfg_weight=cfg)
         else:
-            wav = model.generate(text, audio_prompt_path=voice_path(s),
-                                 exaggeration=exa, cfg_weight=cfg)
+            wav = model.generate(text, audio_prompt_path=ref, exaggeration=exa, cfg_weight=cfg)
         wav = trim_silence(wav.cpu())
         # max_len cuts words after a sound effect, or the mumbled tail Arabic sometimes adds.
         max_len = s.get("max_len", 1.6 if "sfx" in s else None)

@@ -96,15 +96,28 @@ Give each voice a name and switch per line. English lines with `[laugh]`-style t
 
 Full example: [`examples/voice-swap-trailer.json`](examples/voice-swap-trailer.json).
 
+### Voices that belong to nobody
+No second person to clone? Two ways to get extra voices without borrowing anyone's:
+- `"voice": "stock"` uses Chatterbox's built-in voice (the "SYSTEM" alert in the demo).
+- Clone a synthetic voice: render ~15 s with a Kokoro preset and use that as the reference. The demo's "NOVA" is `af_nova`:
+  ```bash
+  npx hyperframes tts "Hello there, I'm Nova..." -v af_nova -o nova-raw.wav
+  ffmpeg -i nova-raw.wav -ac 1 -ar 24000 voices/nova-ai.wav
+  ```
+  NOVA can then laugh, act emotions and speak Arabic like any cloned voice.
+
 ## Demo video
 `demo/video/` is the [HyperFrames](https://hyperframes.dev) project behind the launch video: a 3D audio-reactive ring, a lip-synced avatar that glitches into a hologram when the voice swaps, a live HUD (voice / language / emotion / engine), and English + Arabic subtitles. Lip-sync and the HUD are driven by the `timeline.json` the generator writes, so a new script re-times the whole video.
 
 ```bash
 python skill/scripts/emotive.py examples/voice-swap-trailer.json -o demo/voice-swap.wav
-# copy demo/voice-swap.wav into demo/video/assets/audio/, rebuild voice.js, then:
-cd demo/video && npx hyperframes preview      # edit live
+cd demo/video
+python retime.py ../voice-swap.wav            # re-times subtitles, chips, glitch, sounds, scenes
+npx hyperframes preview                       # edit live
 npx hyperframes render -o renders/demo.mp4    # final mp4
 ```
+
+`retime.py` reads the timeline, so your own script drives the whole video: a line with `"voice": "system"` triggers the glitch swap, the first non-English line triggers the language banner, `"caption"` becomes the second-language subtitle, and `[chuckle]` / `[sigh]` / `[laugh]` become pop-up chips and avatar expressions.
 
 Avatar art was generated with ChatGPT's image model (an original character, not a real person).
 

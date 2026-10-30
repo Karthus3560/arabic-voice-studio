@@ -1,19 +1,28 @@
 {
   "voices": {
     "mehdi": "E:/PC NOW/Claude Skills/tts/voices/dr-mehdi.wav",
-    "holo": "E:/PC NOW/Claude Skills/tts/voices/my-voice.wav"
+    "nova": "E:/PC NOW/Claude Skills/tts/voices/nova-ai.wav",
+    "system": "stock"
   },
   "voice": "mehdi",
   "lang": "en",
   "seed": 7,
   "segments": [
-    {"text": "Every voice... tells a story.", "emotion": "calm", "pause": 0.5},
-    {"text": "Mine? Well... [chuckle] it usually starts with a bad joke.", "pause": 0.4},
-    {"text": "But tonight is different! This voice runs on one laptop. No cloud. No internet!", "emotion": "hype", "pause": 0.45},
-    {"text": "[sigh] And sometimes... it even gets a little emotional.", "pause": 0.9},
-    {"text": "Wait. That's not his voice anymore.", "voice": "holo", "emotion": "surprised", "pause": 0.2},
-    {"text": "[laugh] Yeah... it's mine now.", "voice": "holo", "pause": 0.6},
-    {"text": "أَنَا لَسْتُ هُوَ... أَنَا صَوْتُهُ الجَدِيد.", "voice": "holo", "lang": "ar", "emotion": "warm",
+    {"text": "Every voice... tells a story.", "emotion": "calm", "pause": 0.5,
+     "caption": "لكلِّ صوتٍ... حكاية."},
+    {"text": "Mine? Well... [chuckle] it usually starts with a bad joke.", "pause": 0.4,
+     "caption": "حكايتي؟ حسنًا... (يضحك) تبدأ عادةً بنكتةٍ سيئة."},
+    {"text": "But tonight is different! This voice runs on one laptop. No cloud. No internet!", "emotion": "hype", "pause": 0.45,
+     "caption": "لكنَّ الليلةَ مختلفة! هذا الصوتُ يعملُ على حاسوبٍ واحد. بلا سحابة. بلا إنترنت!"},
+    {"text": "[sigh] And sometimes... it even gets a little emotional.", "pause": 0.5,
+     "caption": "(يتنهّد) وأحيانًا... يصبحُ عاطفيًّا قليلًا."},
+    {"text": "Warning. Voice swap detected.", "voice": "system", "emotion": "calm", "exaggeration": 0.3, "pause": 0.4,
+     "caption": "تحذير. تمّ اكتشافُ تبديلِ الصوت."},
+    {"text": "Wait. That's not his voice anymore.", "voice": "nova", "emotion": "surprised", "pause": 0.2,
+     "caption": "لحظة. هذا لم يعُد صوتَه."},
+    {"text": "[laugh] Yeah... it's mine now.", "voice": "nova", "pause": 0.6,
+     "caption": "(تضحك) نعم... إنّه صوتي الآن."},
+    {"text": "أَنَا لَسْتُ هُوَ... أَنَا صَوْتُهُ الجَدِيد.", "voice": "nova", "lang": "ar", "emotion": "warm",
      "max_len": 4.5, "caption": "I'm not him... I'm his new voice."}
   ]
 }

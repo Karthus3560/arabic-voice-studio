@@ -19,11 +19,9 @@
   <script>
     (function () {
       const V = window.VOICE;
-      const VOICE_START = 1.0; // voice clip starts 1 s into the film
-      const SWAP = 18.15; // glitch lands: Dr. Mehdi -> hologram
-      const SLAM = 29.0; // title impact
-      const HOWTO = 32.7;
-      const DURATION = 47.5;
+      const T = window.TIMING;
+      const VOICE_START = T.VOICE_START, SLAM = T.SLAM, HOWTO = T.HOWTO, DURATION = T.DURATION;
+      const SWAP = T.SWAP ?? 1e9; // glitch lands: Dr. Mehdi -> hologram
 
       function mulberry32(a) {
         return function () {
@@ -106,7 +104,7 @@
         const calm = smooth(HOWTO - 0.5, HOWTO + 1.0, t);
 
         // Camera: slow dolly in through the trailer, shake on the glitch, pull back for the how-to.
-        const glitch = t > 17.7 && t < 18.65 ? 1 : 0;
+        const glitch = T.G0 !== null && t > T.G0 && t < T.G1 ? 1 : 0;
         const shakeR = mulberry32(Math.floor(t * 30) + 7);
         const sx = glitch * (shakeR() - 0.5) * 0.6, sy = glitch * (shakeR() - 0.5) * 0.6;
         const z = 19 - smooth(0, 28, t) * 5 + calm * 6 - flare * 1.5;
