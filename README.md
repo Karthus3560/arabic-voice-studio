@@ -1,5 +1,9 @@
 # Arabic Voice Studio
 
+[![Watch the 47-second demo](assets/poster.jpg)](https://github.com/Karthus3560/arabic-voice-studio/releases/tag/v1.0)
+
+**▶ Watch the demo:** [1080p](https://github.com/Karthus3560/arabic-voice-studio/releases/download/v1.0/arabic-voice-studio-demo-1080p.mp4) · [720p for phones](https://github.com/Karthus3560/arabic-voice-studio/releases/download/v1.0/arabic-voice-studio-demo-720p.mp4)
+
 Emotive Arabic text-to-speech in a cloned voice, **100% offline**. One script, many feelings: calm, warm, sad, hype, surprised, plus real laughs and chuckles in the same voice. Ships as a Claude Code skill (`/arabic-voice-studio`).
 
 > Chatterbox speaks Arabic but has no `[laugh]` tag and one emotion per clip. This splits the script into segments, gives each its own emotion, and splices in non-verbal sounds from Chatterbox Turbo using the same voice reference.
