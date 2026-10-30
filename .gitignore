@@ -1,0 +1,13 @@
+# Cloned voice references and generated audio stay private
+*.wav
+*.m4a
+*.mp3
+voices/
+node_modules/
+__pycache__/
+
+# Video build output (the demo mp4 is attached to the release instead)
+demo/video/renders/
+demo/video/snaps*/
+demo/video/.hyperframes/
+demo/*.timeline.json

@@ -1,0 +1,53 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "ArabicUI";
+      src: local("Segoe UI"), local("Tahoma");
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      text-align: center;
+    }
+    #e-block { display: flex; flex-direction: column; align-items: center; }
+    #e-kicker { font-family: "JetBrains Mono", monospace; font-size: 30px; letter-spacing: 0.3em; color: #a3afd0; }
+    #e-url {
+      margin-top: 26px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 62px;
+      font-weight: 700;
+      padding: 22px 44px;
+      border: 2px solid var(--cyan);
+      border-radius: 16px;
+      background: rgba(62, 240, 255, 0.07);
+      box-shadow: 0 0 60px rgba(62, 240, 255, 0.25);
+    }
+    #e-url .u { color: var(--cyan); }
+    #e-line { margin-top: 40px; font-family: "Montserrat", sans-serif; font-size: 40px; font-weight: 700; }
+    #e-ar { margin-top: 12px; font-family: "ArabicUI", sans-serif; font-size: 40px; font-weight: 700; color: var(--gold); direction: rtl; }
+  </style>
+  <div id="root" data-composition-id="endcard" data-width="1920" data-height="1080">
+    <div id="e-block" class="clip" data-start="0" data-duration="3.8">
+      <div id="e-kicker">OPEN SOURCE · FREE · OFFLINE</div>
+      <div id="e-url">github.com/<span class="u">Karthus3560/arabic-voice-studio</span></div>
+      <div id="e-line">Clone it. Give your friends a voice.</div>
+      <div id="e-ar">جرّبه الآن، وأعطِ أصدقاءك صوتًا جديدًا.</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#e-kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.1);
+      tl.fromTo("#e-url", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.8)" }, 0.2);
+      tl.fromTo("#e-line", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.55);
+      tl.fromTo("#e-ar", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.7);
+      tl.fromTo("#e-url", { boxShadow: "0 0 60px rgba(62,240,255,0.25)" }, { boxShadow: "0 0 110px rgba(62,240,255,0.5)", duration: 1.4, ease: "sine.inOut" }, 1.0);
+      window.__timelines["endcard"] = tl;
+    })();
+  </script>
+</template>

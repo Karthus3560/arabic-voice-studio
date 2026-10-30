@@ -1,0 +1,70 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "ArabicUI";
+      src: local("Segoe UI"), local("Tahoma");
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      text-align: center;
+    }
+    #t-flash {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+    }
+    #t-main {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 150px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+    }
+    #t-main .w { display: inline-block; }
+    #t-main .gold { color: var(--gold); }
+    #t-ar {
+      font-family: "ArabicUI", sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-top: 18px;
+      direction: rtl;
+    }
+    #t-tag {
+      margin-top: 34px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      color: #a3afd0;
+      letter-spacing: 0.06em;
+    }
+    #t-tag .ar { unicode-bidi: isolate; font-family: "ArabicUI", sans-serif; color: var(--ink); }
+    #t-tag .dot { color: var(--magenta); margin: 0 14px; }
+  </style>
+  <div id="root" data-composition-id="title" data-width="1920" data-height="1080">
+    <div id="t-flash" class="clip" data-start="0.4" data-duration="0.5" data-layout-ignore></div>
+    <div id="t-block" class="clip" data-start="0.38" data-duration="3.72">
+      <div id="t-main"><span class="w">ARABIC</span> <span class="w gold">VOICE</span> <span class="w">STUDIO</span></div>
+      <div id="t-ar">استوديو الصوت العربي</div>
+      <div id="t-tag">Clone any voice<span class="dot">·</span>Act any emotion<span class="dot">·</span>English ⇄ <bdi class="ar">العربية</bdi><span class="dot">·</span>100% offline</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#t-flash", { opacity: 0.85 }, { opacity: 0, duration: 0.45, ease: "power2.out" }, 0.4);
+      tl.fromTo("#t-main .w", { scale: 1.8, opacity: 0, filter: "blur(14px)" },
+        { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "power4.out" }, 0.4);
+      tl.fromTo("#t-ar", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.85);
+      tl.fromTo("#t-tag", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 1.15);
+      tl.fromTo("#t-main", { scale: 1 }, { scale: 1.04, duration: 3.3, ease: "none" }, 0.75);
+      tl.to(["#t-main", "#t-ar", "#t-tag"], { opacity: 0, y: -30, duration: 0.3, stagger: 0.04, ease: "power2.in" }, 3.65);
+      window.__timelines["title"] = tl;
+    })();
+  </script>
+</template>

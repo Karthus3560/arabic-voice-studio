@@ -1,0 +1,159 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 42%, #121a36 0%, #070b18 62%);
+    }
+    #bg-canvas {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+  </style>
+  <div id="root" data-composition-id="bg" data-width="1920" data-height="1080">
+    <canvas id="bg-canvas" width="1920" height="1080" data-layout-ignore></canvas>
+  </div>
+  <script>
+    (function () {
+      const V = window.VOICE;
+      const VOICE_START = 1.0; // voice clip starts 1 s into the film
+      const SWAP = 18.15; // glitch lands: Dr. Mehdi -> hologram
+      const SLAM = 29.0; // title impact
+      const HOWTO = 32.7;
+      const DURATION = 47.5;
+
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const rand = mulberry32(42);
+      const env = (t) => {
+        const f = Math.floor((t - VOICE_START) * V.fps);
+        return f >= 0 && f < V.env.length ? V.env[f] : 0;
+      };
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (a, b, x) => { const k = clamp((x - a) / (b - a), 0, 1); return k * k * (3 - 2 * k); };
+
+      const canvas = document.getElementById("bg-canvas");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1);
+      renderer.setSize(1920, 1080, false);
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x070b18, 0.035);
+      const camera = new THREE.PerspectiveCamera(42, 1920 / 1080, 0.1, 200);
+
+      // Particle field: seeded once, drifted from t.
+      const N = 2600;
+      const pos = new Float32Array(N * 3);
+      const seeds = [];
+      for (let i = 0; i < N; i++) {
+        const r = 9 + rand() * 32, a = rand() * Math.PI * 2, y = (rand() - 0.5) * 30;
+        seeds.push({ r, a, y, s: 0.02 + rand() * 0.06 });
+      }
+      const pGeo = new THREE.BufferGeometry();
+      pGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      const pMat = new THREE.PointsMaterial({ size: 0.09, color: 0xffd08a, transparent: true, opacity: 0.75,
+        blending: THREE.AdditiveBlending, depthWrite: false });
+      scene.add(new THREE.Points(pGeo, pMat));
+
+      // Ring of audio bars around the avatar.
+      const BARS = 120, R = 5.2;
+      const bars = [];
+      const barGeo = new THREE.BoxGeometry(0.09, 1, 0.09);
+      barGeo.translate(0, 0.5, 0);
+      const ring = new THREE.Group();
+      for (let i = 0; i < BARS; i++) {
+        const m = new THREE.MeshBasicMaterial({ color: 0xffb547, transparent: true, opacity: 0.9,
+          blending: THREE.AdditiveBlending, depthWrite: false });
+        const b = new THREE.Mesh(barGeo, m);
+        const a = (i / BARS) * Math.PI * 2;
+        b.position.set(Math.cos(a) * R, Math.sin(a) * R, 0);
+        b.rotation.z = a - Math.PI / 2;
+        ring.add(b);
+        bars.push(b);
+      }
+      scene.add(ring);
+
+      // Thin halo rings for depth.
+      const halos = [6.4, 7.6, 9.4].map((r, k) => {
+        const g = new THREE.RingGeometry(r, r + 0.02, 160);
+        const m = new THREE.MeshBasicMaterial({ color: 0x3ef0ff, transparent: true, opacity: 0.18 - k * 0.04,
+          side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false });
+        const mesh = new THREE.Mesh(g, m);
+        scene.add(mesh);
+        return mesh;
+      });
+
+      // Floor grid that shows up for the hologram era.
+      const grid = new THREE.GridHelper(80, 60, 0x3ef0ff, 0x1b3a5c);
+      grid.position.y = -7.5;
+      grid.material.transparent = true;
+      scene.add(grid);
+
+      const gold = new THREE.Color(0xffb547), cyan = new THREE.Color(0x3ef0ff), mag = new THREE.Color(0xff3d9a),
+        white = new THREE.Color(0xffffff), tmp = new THREE.Color();
+
+      function renderAt(t) {
+        const holo = smooth(SWAP - 0.2, SWAP + 0.4, t);
+        const flare = Math.exp(-Math.max(0, t - SLAM) * 2.2) * (t >= SLAM ? 1 : 0);
+        const calm = smooth(HOWTO - 0.5, HOWTO + 1.0, t);
+
+        // Camera: slow dolly in through the trailer, shake on the glitch, pull back for the how-to.
+        const glitch = t > 17.7 && t < 18.65 ? 1 : 0;
+        const shakeR = mulberry32(Math.floor(t * 30) + 7);
+        const sx = glitch * (shakeR() - 0.5) * 0.6, sy = glitch * (shakeR() - 0.5) * 0.6;
+        const z = 19 - smooth(0, 28, t) * 5 + calm * 6 - flare * 1.5;
+        camera.position.set(Math.sin(t * 0.12) * 1.6 + sx, Math.sin(t * 0.09) * 0.7 + sy, z);
+        camera.lookAt(0, 0, 0);
+
+        const e = env(t);
+        ring.rotation.z = t * 0.08;
+        ring.scale.setScalar(1 + flare * 0.35 - calm * 0.15);
+        for (let i = 0; i < BARS; i++) {
+          // Each bar reads the envelope slightly in the past, so the ring ripples outward.
+          const lag = (Math.abs(i - BARS / 2) / BARS) * 0.35;
+          const v = env(t - lag);
+          const wobble = 0.12 + 0.08 * Math.sin(i * 0.7 + t * 2.0);
+          bars[i].scale.y = Math.min(1.5, 0.15 + wobble + v * 1.3) + flare * 2.2 * (0.5 + 0.5 * Math.sin(i * 1.3));
+          tmp.copy(gold).lerp(i % 2 ? cyan : mag, holo).lerp(white, flare * 0.7);
+          bars[i].material.color.copy(tmp);
+          bars[i].material.opacity = (0.55 + v * 0.45) * (1 - calm * 0.55);
+        }
+        halos.forEach((h, k) => {
+          h.rotation.x = 0.3 * Math.sin(t * 0.2 + k);
+          h.rotation.y = 0.3 * Math.cos(t * 0.17 + k);
+          h.scale.setScalar(1 + e * 0.05 * (k + 1) + flare * 0.3);
+          h.material.color.copy(gold).lerp(cyan, holo);
+        });
+        grid.material.opacity = 0.05 + holo * 0.35 * (1 - calm * 0.5);
+        grid.position.z = (t * 1.5) % (80 / 60);
+
+        for (let i = 0; i < N; i++) {
+          const s = seeds[i];
+          const a = s.a + t * s.s;
+          pos[i * 3] = Math.cos(a) * s.r;
+          pos[i * 3 + 1] = s.y + Math.sin(t * 0.3 + i) * 0.3;
+          pos[i * 3 + 2] = Math.min(-2, Math.sin(a) * s.r - 12); // never close enough to the camera to show as squares
+        }
+        pGeo.attributes.position.needsUpdate = true;
+        pMat.color.copy(gold).lerp(cyan, holo);
+        pMat.size = 0.09 + flare * 0.08 + glitch * 0.05;
+
+        renderer.render(scene, camera);
+      }
+
+      const clock = { t: 0 };
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(clock, { t: 0 }, { t: DURATION, duration: DURATION, ease: "none", onUpdate: () => renderAt(clock.t) }, 0);
+      renderAt(0);
+      window.__timelines["bg"] = tl;
+    })();
+  </script>
+</template>

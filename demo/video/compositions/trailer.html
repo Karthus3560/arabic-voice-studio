@@ -1,0 +1,323 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "ArabicUI";
+      src: local("Segoe UI"), local("Tahoma");
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      font-family: "Montserrat", sans-serif;
+      color: var(--ink);
+    }
+    /* Avatar */
+    #av-wrap {
+      position: absolute;
+      left: 600px;
+      top: 92px;
+      width: 720px;
+      height: 720px;
+    }
+    #av-stack, #av-glitch {
+      position: absolute;
+      inset: 0;
+      -webkit-mask-image: radial-gradient(circle at 50% 46%, #000 52%, transparent 71%);
+      mask-image: radial-gradient(circle at 50% 46%, #000 52%, transparent 71%);
+    }
+    #av-stack img, #av-glitch img, #av-glitch .slice {
+      position: absolute;
+      inset: 0;
+      width: 720px;
+      height: 720px;
+      opacity: 0;
+    }
+    #av-glitch .slice img {
+      opacity: 1;
+    }
+    #av-r { mix-blend-mode: screen; filter: sepia(1) saturate(9) hue-rotate(-45deg); }
+    #av-b { mix-blend-mode: screen; filter: sepia(1) saturate(9) hue-rotate(150deg); }
+    #scan {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(62, 240, 255, 0.08) 0 2px, transparent 2px 5px);
+      opacity: 0;
+      -webkit-mask-image: radial-gradient(circle at 50% 46%, #000 52%, transparent 71%);
+      mask-image: radial-gradient(circle at 50% 46%, #000 52%, transparent 71%);
+    }
+    /* HUD */
+    .hud {
+      position: absolute;
+      top: 150px;
+      width: 360px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 28px;
+      letter-spacing: 0.04em;
+      color: #a3afd0;
+    }
+    #hud-left { left: 200px; }
+    #hud-right { right: 200px; text-align: right; }
+    .hud .row { margin-bottom: 22px; }
+    .hud .k { font-size: 20px; letter-spacing: 0.18em; color: #a3afd0; display: block; margin-bottom: 6px; }
+    .hud .v { color: var(--ink); font-size: 30px; font-weight: 700; display: block; }
+    .hud .ar { font-family: "ArabicUI", sans-serif; font-size: 22px; color: #a3afd0; margin-left: 8px; letter-spacing: 0; }
+    #hud-meter { width: 300px; height: 6px; background: #1b2442; border-radius: 3px; overflow: hidden; }
+    #hud-meter-fill { width: 100%; height: 100%; background: var(--gold); transform-origin: left center; }
+    #hud-right .v { font-size: 28px; }
+    #rec-dot { display: inline-block; width: 12px; height: 12px; border-radius: 6px; background: #35ff8a; margin-right: 10px; }
+    /* Chips, banners */
+    .chip {
+      position: absolute;
+      left: 1210px;
+      top: 230px;
+      padding: 12px 22px;
+      border-radius: 40px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 700;
+      color: #070b18;
+      background: var(--gold);
+      box-shadow: 0 0 40px rgba(255, 181, 71, 0.55);
+    }
+    .chip-in { display: inline-block; }
+    #chip-laugh { background: var(--cyan); box-shadow: 0 0 40px rgba(62, 240, 255, 0.6); }
+    .banner {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 120px;
+      text-align: center;
+    }
+    .banner-in {
+      display: inline-block;
+      padding: 14px 34px;
+      border: 2px solid var(--magenta);
+      color: var(--magenta);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      background: rgba(255, 61, 154, 0.08);
+    }
+    .banner-in .ar { font-family: "ArabicUI", sans-serif; letter-spacing: 0; margin-left: 18px; }
+    #lang-in { border-color: var(--cyan); color: var(--cyan); background: rgba(62, 240, 255, 0.08); }
+    #cap-band {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 770px;
+      height: 260px;
+      background: linear-gradient(180deg, rgba(7, 11, 24, 0) 0%, rgba(7, 11, 24, 0.82) 35%, rgba(7, 11, 24, 0.82) 70%, rgba(7, 11, 24, 0) 100%);
+    }
+    .ar, bdi { unicode-bidi: isolate; }
+    /* Captions */
+    .cap {
+      position: absolute;
+      left: 260px;
+      right: 260px;
+      top: 820px;
+      text-align: center;
+    }
+    .cap-in { display: block; }
+    .cap .en { display: block; font-size: 44px; font-weight: 700; line-height: 1.2; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8); }
+    .cap .ar { display: block; direction: rtl; font-family: "ArabicUI", sans-serif; font-size: 38px; color: var(--gold);
+      margin-top: 8px; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8); }
+    .cap .tag { font-style: italic; color: var(--gold); font-weight: 600; }
+    .cap.holo .ar, .cap.holo .tag { color: var(--cyan); }
+    #cap-6 .ar { font-size: 58px; color: var(--cyan); margin: 0 0 10px; }
+    #cap-6 .en { font-size: 36px; color: var(--ink); }
+  </style>
+
+  <div id="root" data-composition-id="trailer" data-width="1920" data-height="1080">
+    <div id="av-wrap" class="clip" data-start="0" data-duration="28.9" data-layout-allow-overlap>
+      <div id="av-stack">
+        <img id="av-closed" src="assets/avatar/mouth-closed.png" alt="" />
+        <img id="av-half" src="assets/avatar/mouth-half.png" alt="" />
+        <img id="av-open" src="assets/avatar/mouth-open.png" alt="" />
+        <img id="av-laugh" src="assets/avatar/laugh.png" alt="" />
+        <img id="av-surprised" src="assets/avatar/surprised.png" alt="" />
+        <img id="av-sad" src="assets/avatar/sad.png" alt="" />
+        <img id="av-hclosed" src="assets/avatar/holo-closed.png" alt="" />
+        <img id="av-hhalf" src="assets/avatar/holo-half.png" alt="" />
+        <img id="av-hopen" src="assets/avatar/holo-open.png" alt="" />
+        <img id="av-hsmirk" src="assets/avatar/holo-smirk.png" alt="" />
+      </div>
+      <div id="av-glitch">
+        <img id="av-r" src="assets/avatar/holo-open.png" alt="" />
+        <img id="av-b" src="assets/avatar/mouth-open.png" alt="" />
+        <div class="slice" id="sl-0"><img src="assets/avatar/holo-open.png" alt="" /></div>
+        <div class="slice" id="sl-1"><img src="assets/avatar/mouth-open.png" alt="" /></div>
+        <div class="slice" id="sl-2"><img src="assets/avatar/holo-closed.png" alt="" /></div>
+        <div class="slice" id="sl-3"><img src="assets/avatar/surprised.png" alt="" /></div>
+        <div class="slice" id="sl-4"><img src="assets/avatar/holo-open.png" alt="" /></div>
+      </div>
+      <div id="scan"></div>
+    </div>
+
+    <div id="hud-left" class="hud clip" data-start="0" data-duration="28.9">
+      <div class="row"><span class="k">VOICE <span class="ar">الصوت</span></span><span class="v" id="hud-voice">DR. MEHDI</span></div>
+      <div class="row"><span class="k">LANGUAGE <span class="ar">اللغة</span></span><span class="v" id="hud-lang">EN</span></div>
+      <div class="row"><span class="k">EMOTION <span class="ar">الشعور</span></span><span class="v" id="hud-emo">CALM</span></div>
+      <div class="row"><span class="k">ENERGY</span><div id="hud-meter"><div id="hud-meter-fill"></div></div></div>
+    </div>
+    <div id="hud-right" class="hud clip" data-start="0" data-duration="28.9">
+      <div class="row"><span class="k">STATUS</span><span class="v"><span id="rec-dot"></span>100% OFFLINE</span></div>
+      <div class="row"><span class="k">ENGINE</span><span class="v" id="hud-engine">chatterbox · classic</span></div>
+      <div class="row"><span class="k">RUNS ON</span><span class="v">1 LAPTOP GPU</span></div>
+      <div class="row"><span class="k">CLOUD</span><span class="v">NONE</span></div>
+    </div>
+
+    <div id="chip-chuckle" class="chip clip" data-start="5.2" data-duration="1.5"><span class="chip-in">[chuckle]</span></div>
+    <div id="chip-sigh" class="chip clip" data-start="14.05" data-duration="1.5"><span class="chip-in">[sigh]</span></div>
+    <div id="chip-laugh" class="chip clip" data-start="21.9" data-duration="1.6"><span class="chip-in">[laugh]</span></div>
+
+    <div id="swap" class="banner clip" data-start="17.9" data-duration="2.4"><span class="banner-in" id="swap-in">VOICE SWAP DETECTED<span class="ar">تم تبديل الصوت</span></span></div>
+    <div id="lang" class="banner clip" data-start="24.45" data-duration="1.9"><span class="banner-in" id="lang-in">LANGUAGE → العربية</span></div>
+
+    <div id="cap-band" class="clip" data-start="0" data-duration="28.9" data-layout-ignore></div>
+
+    <div id="cap-0" class="cap clip" data-start="1.0" data-duration="2.7"><span class="cap-in">
+      <span class="en">Every voice... tells a story.</span><span class="ar">لكلِّ صوتٍ... حكاية.</span></span></div>
+    <div id="cap-1" class="cap clip" data-start="3.82" data-duration="4.45"><span class="cap-in">
+      <span class="en">Mine? Well... <span class="tag">*chuckles*</span> it usually starts with a bad joke.</span>
+      <span class="ar">حكايتي؟ حسنًا... (يضحك) تبدأ عادةً بنكتةٍ سيئة.</span></span></div>
+    <div id="cap-2a" class="cap clip" data-start="8.41" data-duration="1.5"><span class="cap-in">
+      <span class="en">But tonight is different!</span><span class="ar">لكنَّ الليلةَ مختلفة!</span></span></div>
+    <div id="cap-2b" class="cap clip" data-start="9.91" data-duration="3.95"><span class="cap-in">
+      <span class="en">This voice runs on one laptop. No cloud. No internet!</span>
+      <span class="ar">هذا الصوتُ يعملُ على حاسوبٍ واحد. بلا سحابة. بلا إنترنت!</span></span></div>
+    <div id="cap-3" class="cap clip" data-start="14.03" data-duration="3.69"><span class="cap-in">
+      <span class="en"><span class="tag">*sighs*</span> And sometimes... it even gets a little emotional.</span>
+      <span class="ar">(يتنهّد) وأحيانًا... يصبحُ عاطفيًّا قليلًا.</span></span></div>
+    <div id="cap-4" class="cap holo clip" data-start="18.62" data-duration="3.2"><span class="cap-in">
+      <span class="en">Wait. That's not his voice anymore.</span><span class="ar">لحظة. هذا لم يعُد صوتَه.</span></span></div>
+    <div id="cap-5" class="cap holo clip" data-start="21.87" data-duration="2.6"><span class="cap-in">
+      <span class="en"><span class="tag">*laughs*</span> Yeah... it's mine now.</span><span class="ar">(يضحك) نعم... إنّه صوتي الآن.</span></span></div>
+    <div id="cap-6" class="cap holo clip" data-start="24.59" data-duration="4.2"><span class="cap-in">
+      <span class="ar">أَنَا لَسْتُ هُوَ... أَنَا صَوْتُهُ الجَدِيد.</span><span class="en">I'm not him... I'm his new voice.</span></span></div>
+  </div>
+
+  <script>
+    (function () {
+      const V = window.VOICE;
+      const VOICE_START = 1.0;
+      const G0 = 17.72, G1 = 18.62, SWAP = 18.15; // glitch window and the moment the hologram takes over
+      const DURATION = 28.9;
+      const segs = V.segments.map((s) => ({ ...s, a: s.start + VOICE_START, b: s.end + VOICE_START }));
+      const EMO = ["CALM", "AMUSED", "HYPE", "EMOTIONAL", "SURPRISED", "LAUGHING", "WARM"];
+      const ENGINE = ["classic", "turbo", "classic", "turbo", "classic", "turbo", "multilingual"];
+
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const env = (t) => {
+        const f = Math.floor((t - VOICE_START) * V.fps);
+        return f >= 0 && f < V.env.length ? V.env[f] : 0;
+      };
+      const $ = (id) => document.getElementById(id);
+      const faces = ["closed", "half", "open", "laugh", "surprised", "sad", "hclosed", "hhalf", "hopen", "hsmirk"]
+        .reduce((o, k) => ((o[k] = $("av-" + k)), o), {});
+      const slices = [0, 1, 2, 3, 4].map((i) => $("sl-" + i));
+      const hud = { voice: $("hud-voice"), lang: $("hud-lang"), emo: $("hud-emo"), engine: $("hud-engine"),
+        fill: $("hud-meter-fill"), dot: $("rec-dot") };
+      const wrap = $("av-stack"), scan = $("scan"), avR = $("av-r"), avB = $("av-b");
+      let shown = null;
+
+      function show(face) {
+        if (face === shown) return;
+        for (const k in faces) faces[k].style.opacity = k === face ? 1 : 0;
+        shown = face;
+      }
+
+      function pickFace(t) {
+        const holo = t >= SWAP;
+        if (t >= G0 && t < SWAP) return t < G0 + 0.22 ? "surprised" : "open";
+        const seg = segs.findIndex((s) => t >= s.a && t < s.b);
+        const e = env(t), e2 = Math.max(e, env(t - 1 / 30));
+        const mouth = e2 < 0.1 ? "closed" : e2 < 0.38 ? "half" : "open";
+        if (seg === 1) {
+          const rel = t - segs[1].a;
+          if (rel > 1.25 && rel < 2.1) return "laugh";
+        }
+        if (seg === 3 && e2 < 0.14) return "sad";
+        if (seg === 5) return e2 > 0.5 ? "hopen" : "hsmirk";
+        return holo ? "h" + mouth : mouth;
+      }
+
+      function renderAt(t) {
+        const e = env(t);
+        show(pickFace(t));
+        // Breath and voice-driven bob.
+        const bob = Math.sin(t * 1.6) * 4 - e * 6;
+        wrap.style.transform = `translateY(${bob}px) scale(${1 + e * 0.012})`;
+
+        // Glitch: RGB split and displaced slices, seeded per frame.
+        const inG = t >= G0 && t < G1;
+        const r = mulberry32(Math.floor(t * 30) * 13 + 5);
+        avR.style.opacity = inG ? 0.55 : 0;
+        avB.style.opacity = inG ? 0.55 : 0;
+        avR.style.transform = `translateX(${inG ? 10 + r() * 22 : 0}px)`;
+        avB.style.transform = `translateX(${inG ? -(10 + r() * 22) : 0}px)`;
+        slices.forEach((s) => {
+          const on = inG && r() > 0.35;
+          const top = Math.floor(r() * 85), h = 4 + Math.floor(r() * 12);
+          s.style.opacity = on ? 1 : 0;
+          s.style.clipPath = `inset(${top}% 0 ${Math.max(0, 100 - top - h)}% 0)`;
+          s.style.transform = `translateX(${(r() - 0.5) * 120}px)`;
+        });
+        scan.style.opacity = t >= SWAP ? 0.6 + 0.2 * Math.sin(t * 9) : inG ? 0.9 : 0;
+
+        // HUD readout.
+        // Latest segment that has started, so the readout depends on t alone.
+        let seg = 0;
+        segs.forEach((s, i) => { if (t >= s.a - 0.05) seg = i; });
+        const holo = t >= SWAP;
+        if (inG) {
+          const chars = "#$%&@!?01ABCDEFXZ";
+          hud.voice.textContent = Array.from({ length: 9 }, () => chars[Math.floor(r() * chars.length)]).join("");
+          hud.voice.style.color = "#ff3d9a";
+        } else {
+          hud.voice.textContent = holo ? "CLONE #2" : "DR. MEHDI";
+          hud.voice.style.color = holo ? "#3ef0ff" : "#eef3ff";
+        }
+        hud.lang.textContent = t >= segs[6].a - 0.1 ? "AR · العربية" : "EN · English";
+        hud.emo.textContent = inG ? "???" : EMO[seg];
+        hud.engine.textContent = "chatterbox · " + ENGINE[seg];
+        hud.fill.style.transform = `scaleX(${0.04 + e * 0.96})`;
+        hud.fill.style.background = holo ? "#3ef0ff" : "#ffb547";
+        hud.dot.style.opacity = Math.floor(t * 2) % 2 ? 0.35 : 1;
+      }
+
+      const clock = { t: 0 };
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(clock, { t: 0 }, { t: DURATION, duration: DURATION, ease: "none", onUpdate: () => renderAt(clock.t) }, 0);
+
+      // Entrances.
+      tl.fromTo("#av-wrap", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 0.1);
+      tl.fromTo("#hud-left .row", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.35, stagger: 0.08, ease: "power3.out" }, 0.3);
+      tl.fromTo("#hud-right .row", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.35, stagger: 0.08, ease: "power3.out" }, 0.4);
+      [["#chip-chuckle", 5.2], ["#chip-sigh", 14.05], ["#chip-laugh", 21.9]].forEach(([sel, at]) => {
+        tl.fromTo(sel + " .chip-in", { scale: 0.4, opacity: 0, y: 20 }, { scale: 1, opacity: 1, y: 0, duration: 0.3, ease: "back.out(2.4)" }, at);
+        tl.to(sel + " .chip-in", { opacity: 0, y: -16, duration: 0.25, ease: "power2.in" }, at + 1.2);
+      });
+      tl.fromTo("#swap-in", { scaleX: 0.2, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.18, ease: "power4.out" }, 17.9);
+      tl.to("#swap-in", { opacity: 0, duration: 0.25 }, 20.05);
+      tl.fromTo("#lang-in", { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 24.45);
+      tl.to("#lang-in", { opacity: 0, duration: 0.25 }, 26.05);
+      document.querySelectorAll("#root .cap").forEach((c) => {
+        const a = parseFloat(c.dataset.start), d = parseFloat(c.dataset.duration);
+        const inner = c.querySelector(".cap-in");
+        tl.fromTo(inner, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" }, a);
+        tl.to(inner, { opacity: 0, duration: 0.18, ease: "power1.in" }, a + d - 0.22);
+      });
+      tl.to(["#av-wrap", "#hud-left", "#hud-right"], { opacity: 0, duration: 0.35, ease: "power2.in" }, 28.45);
+
+      renderAt(0);
+      window.__timelines["trailer"] = tl;
+    })();
+  </script>
+</template>

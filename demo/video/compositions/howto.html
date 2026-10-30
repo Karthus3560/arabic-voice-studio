@@ -1,0 +1,126 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "ArabicUI";
+      src: local("Segoe UI"), local("Tahoma");
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      color: var(--ink);
+      font-family: "Montserrat", sans-serif;
+    }
+    #h-head {
+      position: absolute;
+      left: 200px;
+      top: 150px;
+    }
+    #h-head .en { font-family: "Archivo Black", sans-serif; font-size: 76px; line-height: 1; }
+    #h-head .ar { font-family: "ArabicUI", sans-serif; font-size: 46px; font-weight: 700; color: var(--gold); margin-top: 12px; }
+    #h-steps {
+      position: absolute;
+      left: 200px;
+      top: 400px;
+      width: 560px;
+    }
+    .step {
+      display: flex;
+      align-items: baseline;
+      gap: 22px;
+      margin-bottom: 44px;
+      opacity: 0.28;
+    }
+    .step .n { font-family: "JetBrains Mono", monospace; font-size: 30px; color: var(--cyan); font-weight: 700; }
+    .step .en { font-size: 40px; font-weight: 800; display: block; }
+    .step .ar { font-family: "ArabicUI", sans-serif; font-size: 30px; color: #a3afd0; display: block; margin-top: 4px; }
+    #h-term {
+      position: absolute;
+      left: 840px;
+      top: 300px;
+      width: 880px;
+      height: 470px;
+      background: rgba(10, 16, 34, 0.88);
+      border: 1px solid #24315c;
+      border-radius: 18px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(62, 240, 255, 0.08);
+      overflow: hidden;
+    }
+    #h-bar { height: 52px; background: #111a36; display: flex; align-items: center; padding: 0 22px; gap: 10px; }
+    #h-bar i { width: 14px; height: 14px; border-radius: 7px; display: block; }
+    #h-bar .t { margin-left: 16px; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--muted); }
+    .pane {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 52px;
+      bottom: 0;
+      padding: 36px 40px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 28px;
+      line-height: 1.6;
+      color: #cfe1ff;
+    }
+    .ln { display: block; white-space: pre; }
+    .p { color: #35ff8a; }
+    .c { color: #8b98c0; }
+    .s { color: var(--gold); }
+    .k { color: var(--cyan); }
+    .arx { font-family: "ArabicUI", sans-serif; color: var(--gold); }
+  </style>
+  <div id="root" data-composition-id="howto" data-width="1920" data-height="1080">
+    <div id="h-head" class="clip" data-start="0" data-duration="11">
+      <div class="en">How to use it</div>
+      <div class="ar">طريقة الاستخدام</div>
+    </div>
+    <div id="h-steps" class="clip" data-start="0" data-duration="11">
+      <div class="step" id="st-1"><span class="n">01</span><span><span class="en">Clone it</span><span class="ar">انسخ المستودع</span></span></div>
+      <div class="step" id="st-2"><span class="n">02</span><span><span class="en">Add a voice</span><span class="ar">أضف صوتًا (٢٠ ثانية)</span></span></div>
+      <div class="step" id="st-3"><span class="n">03</span><span><span class="en">Write emotions, run</span><span class="ar">اكتب المشاعر وشغّل</span></span></div>
+    </div>
+    <div id="h-term" class="clip" data-start="0" data-duration="11">
+      <div id="h-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="t" data-layout-ignore>arabic-voice-studio</span></div>
+      <div class="pane clip" id="pane-1" data-start="0.5" data-duration="3.6">
+        <span class="ln"><span class="c"># 1. get the code</span></span>
+        <span class="ln"><span class="p">$</span> git clone https://github.com/</span>
+        <span class="ln">    Karthus3560/arabic-voice-studio</span>
+        <span class="ln"><span class="p">$</span> cd arabic-voice-studio</span>
+        <span class="ln"><span class="p">$</span> pip install chatterbox-tts</span>
+        <span class="ln"><span class="c"># needs: NVIDIA GPU 6 GB · Python 3.11</span></span>
+      </div>
+      <div class="pane clip" id="pane-2" data-start="4.1" data-duration="3.6">
+        <span class="ln"><span class="c"># 2. record 20 s of clean speech</span></span>
+        <span class="ln"><span class="c">#    (with the speaker's permission)</span></span>
+        <span class="ln"><span class="p">$</span> ffmpeg -i friend.m4a -ac 1 \</span>
+        <span class="ln">    -ar 24000 -t 20 voices/friend.wav</span>
+        <span class="ln"> </span>
+        <span class="ln"><span class="k">✓</span> voice ready: <span class="s">voices/friend.wav</span></span>
+      </div>
+      <div class="pane clip" id="pane-3" data-start="7.7" data-duration="3.3">
+        <span class="ln"><span class="c"># 3. script.json: one emotion per line</span></span>
+        <span class="ln">{<span class="k">"text"</span>: <span class="s">"Every voice tells a story."</span>,</span>
+        <span class="ln"> <span class="k">"emotion"</span>: <span class="s">"calm"</span>},</span>
+        <span class="ln">{<span class="k">"sfx"</span>: <span class="s">"[laugh]"</span>},</span>
+        <span class="ln">{<span class="k">"text"</span>: <span class="arx">"أنا صوته الجديد"</span>, <span class="k">"lang"</span>: <span class="s">"ar"</span>}</span>
+        <span class="ln"><span class="p">$</span> python emotive.py script.json</span>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#h-head", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 0);
+      tl.fromTo("#h-head .en", { x: -40 }, { x: 0, duration: 0.45, ease: "power3.out" }, 0);
+      tl.fromTo("#h-term", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.15);
+      tl.fromTo("#h-bar", { y: -20 }, { y: 0, duration: 0.4, ease: "power3.out" }, 0.15);
+      tl.fromTo("#h-steps .step", { x: -30 }, { x: 0, duration: 0.4, stagger: 0.08, ease: "power3.out" }, 0.2);
+      // Highlight the active step while its terminal pane types out line by line.
+      [[1, 0.5], [2, 4.1], [3, 7.7]].forEach(([n, at]) => {
+        tl.fromTo("#st-" + n, { opacity: 0.28 }, { opacity: 1, duration: 0.25 }, at);
+        if (n < 3) tl.to("#st-" + n, { opacity: 0.45, duration: 0.25 }, at + 3.5);
+        tl.fromTo(`#pane-${n} .ln`, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.12, stagger: 0.18, ease: "power2.out" }, at + 0.2);
+      });
+      tl.to(["#h-head", "#h-steps", "#h-term"], { opacity: 0, duration: 0.3 }, 10.65);
+      window.__timelines["howto"] = tl;
+    })();
+  </script>
+</template>

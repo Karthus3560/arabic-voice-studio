@@ -1,0 +1,19 @@
+{
+  "voices": {
+    "mehdi": "E:/PC NOW/Claude Skills/tts/voices/dr-mehdi.wav",
+    "holo": "E:/PC NOW/Claude Skills/tts/voices/my-voice.wav"
+  },
+  "voice": "mehdi",
+  "lang": "en",
+  "seed": 7,
+  "segments": [
+    {"text": "Every voice... tells a story.", "emotion": "calm", "pause": 0.5},
+    {"text": "Mine? Well... [chuckle] it usually starts with a bad joke.", "pause": 0.4},
+    {"text": "But tonight is different! This voice runs on one laptop. No cloud. No internet!", "emotion": "hype", "pause": 0.45},
+    {"text": "[sigh] And sometimes... it even gets a little emotional.", "pause": 0.9},
+    {"text": "Wait. That's not his voice anymore.", "voice": "holo", "emotion": "surprised", "pause": 0.2},
+    {"text": "[laugh] Yeah... it's mine now.", "voice": "holo", "pause": 0.6},
+    {"text": "أَنَا لَسْتُ هُوَ... أَنَا صَوْتُهُ الجَدِيد.", "voice": "holo", "lang": "ar", "emotion": "warm",
+     "max_len": 4.5, "caption": "I'm not him... I'm his new voice."}
+  ]
+}
